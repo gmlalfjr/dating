@@ -9,6 +9,7 @@ import (
 type ISwipeRepository interface {
 	CreateSwipe(c *gin.Context, userId int, swipedUserId int, action string) error
 	FindOneByUserIdAndSwipedUserId(c *gin.Context, userId int, swipedUserId int) (*entities.Swipe, error)
+	CountUserSwipe(c *gin.Context, userId int) (int64, error)
 }
 
 type SwipeRepository struct {

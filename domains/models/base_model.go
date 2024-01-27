@@ -12,6 +12,8 @@ type BaseRequest struct {
 }
 
 type UserRequest struct {
-	ID    int    `json:"id"`
-	Email string `json:"email"`
+	ID               int    `json:"id"`
+	Email            string `json:"email"`
+	IsPremium        bool   `json:"is_premium"`
+	PremiumExpiredAt string `json:"premium_expired_at"`
 }

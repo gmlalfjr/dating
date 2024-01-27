@@ -5,6 +5,7 @@ import (
 	"dating/constants"
 	"dating/domains/entities"
 	"dating/repository/sql/auth"
+	"dating/repository/sql/premium_user"
 	"dating/repository/sql/profile"
 	"dating/repository/sql/swipe"
 	"fmt"
@@ -14,17 +15,19 @@ import (
 )
 
 type Repository struct {
-	AuthRepo    auth.IAuthRepository
-	ProfileRepo profile.IProfileRepository
-	SwipeRepo   swipe.ISwipeRepository
+	AuthRepo        auth.IAuthRepository
+	ProfileRepo     profile.IProfileRepository
+	SwipeRepo       swipe.ISwipeRepository
+	PremiumUserRepo premium_user.IPremiumUserRepository
 }
 
 func InitRepository() *Repository {
 	mysqlRepo := initMySql()
 	return &Repository{
-		AuthRepo:    auth.InitAuthRepository(mysqlRepo),
-		ProfileRepo: profile.InitProfileRepository(mysqlRepo),
-		SwipeRepo:   swipe.InitSwipeRepository(mysqlRepo),
+		AuthRepo:        auth.InitAuthRepository(mysqlRepo),
+		ProfileRepo:     profile.InitProfileRepository(mysqlRepo),
+		SwipeRepo:       swipe.InitSwipeRepository(mysqlRepo),
+		PremiumUserRepo: premium_user.InitPremiumUserRepository(mysqlRepo),
 	}
 }
 
@@ -48,7 +51,7 @@ func initMySql() *gorm.DB {
 	}
 
 	if constants.AutoMigrate == "true" {
-		dborm.Migrator().AutoMigrate(&entities.User{}, &entities.Swipe{})
+		dborm.Migrator().AutoMigrate(&entities.User{}, &entities.Swipe{}, &entities.PremiumUser{})
 		//dborm.Migrator().AutoMigrate(&entities.Swipe{})
 	}
 

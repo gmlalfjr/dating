@@ -27,3 +27,14 @@ func (s *SwipeRepository) FindOneByUserIdAndSwipedUserId(c *gin.Context, userId 
 
 	return response, nil
 }
+
+func (s *SwipeRepository) CountUserSwipe(c *gin.Context, userId int) (int64, error) {
+
+	var totalSwipes int64
+	if err := s.db.Debug().Model(&entities.Swipe{}).Where("user_id = ? AND DATE(created_at) = CURRENT_DATE", userId).Count(&totalSwipes).Error; err != nil {
+		return 0, err
+	}
+
+	return totalSwipes, nil
+
+}

@@ -3,6 +3,7 @@ package auth
 import (
 	"dating/domains/models"
 	"dating/repository/sql/auth"
+	"dating/repository/sql/premium_user"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,7 +13,8 @@ type IAuthService interface {
 }
 
 type AuthService struct {
-	AuthRepository auth.IAuthRepository
+	AuthRepository  auth.IAuthRepository
+	PremiumUserRepo premium_user.IPremiumUserRepository
 }
 
 func InitAuthServices(authService *AuthService) IAuthService {

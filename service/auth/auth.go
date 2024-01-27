@@ -36,7 +36,8 @@ func (a *AuthService) Register(c *gin.Context, request *models.RegisterRequest) 
 }
 
 func (a *AuthService) Login(c *gin.Context, request *models.LoginRequest) (*models.LoginResponse, error) {
-	res, err := a.AuthRepository.FindOneUserByEmail(c, request.Email)
+	var isPremium = false
+	res, err := a.PremiumUserRepo.FindByEmail(c, request.Email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, response.NewError(err, 404, "Wrong email or password")
@@ -48,10 +49,18 @@ func (a *AuthService) Login(c *gin.Context, request *models.LoginRequest) (*mode
 		return nil, err
 	}
 
-	token, err := a.generateToken(map[string]interface{}{
-		"id":    res.ID,
-		"email": res.Email,
-	})
+	genTokenData := jwt.MapClaims{
+		"id":         res.ID,
+		"email":      res.Email,
+		"is_premium": false,
+		"exp":        time.Now().Add(time.Minute * 1200).Unix(),
+	}
+	if !res.ExpiredAt.IsZero() && res.ExpiredAt.After(time.Now()) {
+		isPremium = true
+		genTokenData["is_premium"] = isPremium
+		genTokenData["premium_expired_at"] = res.ExpiredAt
+	}
+	token, err := a.generateToken(genTokenData)
 	return &models.LoginResponse{
 		Email:        res.Email,
 		Token:        token.Token,
@@ -73,17 +82,10 @@ func (a *AuthService) hashingPassword(c *gin.Context, passwordOne, passwordTwo s
 	return string(hash), nil
 }
 
-func (a *AuthService) generateToken(data map[string]interface{}) (*models.TokenLogin, error) {
-	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":    data["id"],
-		"email": data["email"],
-		"exp":   time.Now().Add(time.Minute * 1200).Unix(),
-	})
-	generateRefreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":    data["id"],
-		"email": data["email"],
-		"exp":   time.Now().Add(time.Minute * 1200).Unix(),
-	})
+func (a *AuthService) generateToken(data jwt.MapClaims) (*models.TokenLogin, error) {
+	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, data)
+	data["exp"] = time.Now().Add(time.Minute * 2400).Unix()
+	generateRefreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, data)
 	tokenString, err := generateToken.SignedString([]byte(constants.JWTToken))
 	refreshTokenString, errRefresh := generateRefreshToken.SignedString([]byte(constants.RefreshJWTToken))
 	if err != nil || errRefresh != nil {
