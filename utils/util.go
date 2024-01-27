@@ -45,3 +45,10 @@ func AutoMap(from interface{}, to interface{}) error {
 	err := json.Unmarshal([]byte(jsonFrom), to)
 	return err
 }
+
+func CheckMapString(list map[string]string, lookup string) bool {
+	if _, ok := list[lookup]; ok {
+		return true
+	}
+	return false
+}

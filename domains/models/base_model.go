@@ -12,6 +12,6 @@ type BaseRequest struct {
 }
 
 type UserRequest struct {
-	ID       int    `json:"id"`
-	Username string `json:"username"`
+	ID    int    `json:"id"`
+	Email string `json:"email"`
 }

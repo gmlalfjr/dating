@@ -5,6 +5,7 @@ import (
 	"dating/constants"
 	"dating/domains/entities"
 	"dating/repository/sql/auth"
+	"dating/repository/sql/profile"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -12,13 +13,15 @@ import (
 )
 
 type Repository struct {
-	AuthRepo auth.IAuthRepository
+	AuthRepo    auth.IAuthRepository
+	ProfileRepo profile.IProfileRepository
 }
 
 func InitRepository() *Repository {
 	mysqlRepo := initMySql()
 	return &Repository{
-		AuthRepo: auth.InitAuthRepository(mysqlRepo),
+		AuthRepo:    auth.InitAuthRepository(mysqlRepo),
+		ProfileRepo: profile.InitProfileRepository(mysqlRepo),
 	}
 }
 

@@ -3,7 +3,8 @@ package app
 import "dating/controllers"
 
 var (
-	parentGroupAuth = "auth/"
+	parentGroupAuth    = "auth/"
+	parentGroupProfile = "profile/"
 )
 
 type IRoutes interface {
@@ -22,7 +23,7 @@ func initRoutes(controller *controllers.Controller) *Routes {
 }
 func (r *Routes) registerRoutes() {
 	r.authRouter()
-
+	r.profileRoutes()
 }
 
 func (r *Routes) authRouter() {
@@ -30,5 +31,12 @@ func (r *Routes) authRouter() {
 	{
 		authRoute.POST("register", r.controller.AuthController.Register)
 		authRoute.POST("login", r.controller.AuthController.Login)
+	}
+}
+
+func (r *Routes) profileRoutes() {
+	profileRoute := router.Group(parentGroupProfile).Use(r.controller.AuthMiddleware.JWTVerifyToken)
+	{
+		profileRoute.GET("", r.controller.ProfileController.ListProfile)
 	}
 }
