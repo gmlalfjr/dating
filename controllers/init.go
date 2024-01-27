@@ -4,6 +4,7 @@ import (
 	"dating/app/config"
 	"dating/controllers/auth"
 	"dating/controllers/profile"
+	"dating/controllers/swipe"
 	"dating/middleware"
 )
 
@@ -11,6 +12,7 @@ type Controller struct {
 	AuthController    auth.IAuthController
 	AuthMiddleware    middleware.IAuthMiddleware
 	ProfileController profile.IProfileController
+	SwipeController   swipe.ISwipeController
 }
 
 func InitController(services config.Services) *Controller {
@@ -18,5 +20,6 @@ func InitController(services config.Services) *Controller {
 		AuthMiddleware:    middleware.InitAuthMiddleware(),
 		AuthController:    auth.InitAuthController(services.AuthService),
 		ProfileController: profile.InitProfileController(services.ProfileService),
+		SwipeController:   swipe.InitSwipeController(services.SwipeService),
 	}
 }

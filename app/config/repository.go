@@ -6,6 +6,7 @@ import (
 	"dating/domains/entities"
 	"dating/repository/sql/auth"
 	"dating/repository/sql/profile"
+	"dating/repository/sql/swipe"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -15,6 +16,7 @@ import (
 type Repository struct {
 	AuthRepo    auth.IAuthRepository
 	ProfileRepo profile.IProfileRepository
+	SwipeRepo   swipe.ISwipeRepository
 }
 
 func InitRepository() *Repository {
@@ -22,6 +24,7 @@ func InitRepository() *Repository {
 	return &Repository{
 		AuthRepo:    auth.InitAuthRepository(mysqlRepo),
 		ProfileRepo: profile.InitProfileRepository(mysqlRepo),
+		SwipeRepo:   swipe.InitSwipeRepository(mysqlRepo),
 	}
 }
 
@@ -45,7 +48,8 @@ func initMySql() *gorm.DB {
 	}
 
 	if constants.AutoMigrate == "true" {
-		dborm.AutoMigrate(&entities.User{})
+		dborm.Migrator().AutoMigrate(&entities.User{}, &entities.Swipe{})
+		//dborm.Migrator().AutoMigrate(&entities.Swipe{})
 	}
 
 	return dborm

@@ -5,6 +5,7 @@ import "dating/controllers"
 var (
 	parentGroupAuth    = "auth/"
 	parentGroupProfile = "profile/"
+	swipeGroupProfile  = "swipe/"
 )
 
 type IRoutes interface {
@@ -24,6 +25,7 @@ func initRoutes(controller *controllers.Controller) *Routes {
 func (r *Routes) registerRoutes() {
 	r.authRouter()
 	r.profileRoutes()
+	r.swipeRoutes()
 }
 
 func (r *Routes) authRouter() {
@@ -38,5 +40,13 @@ func (r *Routes) profileRoutes() {
 	profileRoute := router.Group(parentGroupProfile).Use(r.controller.AuthMiddleware.JWTVerifyToken)
 	{
 		profileRoute.GET("", r.controller.ProfileController.ListProfile)
+	}
+}
+
+func (r *Routes) swipeRoutes() {
+	swipeRoute := router.Group(swipeGroupProfile).Use(r.controller.AuthMiddleware.JWTVerifyToken)
+	{
+		swipeRoute.GET("left/:id", r.controller.SwipeController.SwipeLeft)
+		swipeRoute.GET("right/:id", r.controller.SwipeController.SwipeRight)
 	}
 }
