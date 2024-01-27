@@ -8,6 +8,7 @@ import (
 
 type IAuthService interface {
 	Register(c *gin.Context, request *models.RegisterRequest) (*models.RegisterResponse, error)
+	Login(c *gin.Context, request *models.LoginRequest) (*models.LoginResponse, error)
 }
 
 type AuthService struct {

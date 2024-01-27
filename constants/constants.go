@@ -18,3 +18,8 @@ var (
 	MySQLDBSchema string = os.Getenv("DB_SCHEMA")
 	AutoMigrate   string = ""
 )
+
+var (
+	JWTToken        = ""
+	RefreshJWTToken = ""
+)

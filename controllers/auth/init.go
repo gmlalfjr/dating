@@ -7,6 +7,7 @@ import (
 
 type IAuthController interface {
 	Register(c *gin.Context)
+	Login(c *gin.Context)
 }
 
 type AuthController struct {

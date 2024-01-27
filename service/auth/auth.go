@@ -1,11 +1,15 @@
 package auth
 
 import (
+	"dating/constants"
 	"dating/domains/models"
 	"dating/response"
 	"errors"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -31,6 +35,30 @@ func (a *AuthService) Register(c *gin.Context, request *models.RegisterRequest) 
 
 }
 
+func (a *AuthService) Login(c *gin.Context, request *models.LoginRequest) (*models.LoginResponse, error) {
+	res, err := a.AuthRepository.FindOneUserByEmail(c, request.Email)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, response.NewError(err, 404, "Wrong email or password")
+		}
+		return nil, err
+	}
+	err = a.checkPasswordHash(c, res.Password, request.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := a.generateToken(map[string]interface{}{
+		"id":    res.ID,
+		"email": res.Email,
+	})
+	return &models.LoginResponse{
+		Email:        res.Email,
+		Token:        token.Token,
+		RefreshToken: token.RefreshToken,
+	}, nil
+}
+
 func (a *AuthService) hashingPassword(c *gin.Context, passwordOne, passwordTwo string) (string, error) {
 
 	if passwordOne != passwordTwo {
@@ -43,4 +71,35 @@ func (a *AuthService) hashingPassword(c *gin.Context, passwordOne, passwordTwo s
 
 	}
 	return string(hash), nil
+}
+
+func (a *AuthService) generateToken(data map[string]interface{}) (*models.TokenLogin, error) {
+	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":    data["id"],
+		"email": data["email"],
+		"exp":   time.Now().Add(time.Minute * 1200).Unix(),
+	})
+	generateRefreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":    data["id"],
+		"email": data["email"],
+		"exp":   time.Now().Add(time.Minute * 1200).Unix(),
+	})
+	tokenString, err := generateToken.SignedString([]byte(constants.JWTToken))
+	refreshTokenString, errRefresh := generateRefreshToken.SignedString([]byte(constants.RefreshJWTToken))
+	if err != nil || errRefresh != nil {
+		return nil, response.NewError(errors.New("Failed Generated Token"), 400, "Failed Generated Token")
+	}
+	return &models.TokenLogin{
+		Token:        tokenString,
+		RefreshToken: refreshTokenString,
+	}, nil
+}
+
+func (a *AuthService) checkPasswordHash(c *gin.Context, hash string, password string) error {
+
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err != nil {
+		return response.NewError(err, 400, "Wrong email or password")
+	}
+	return nil
 }

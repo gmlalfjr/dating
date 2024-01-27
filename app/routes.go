@@ -29,5 +29,6 @@ func (r *Routes) authRouter() {
 	authRoute := router.Group(parentGroupAuth)
 	{
 		authRoute.POST("register", r.controller.AuthController.Register)
+		authRoute.POST("login", r.controller.AuthController.Login)
 	}
 }
