@@ -1,8 +1,13 @@
 package auth
 
-import "dating/repository/sql/auth"
+import (
+	"dating/domains/models"
+	"dating/repository/sql/auth"
+	"github.com/gin-gonic/gin"
+)
 
 type IAuthService interface {
+	Register(c *gin.Context, request *models.RegisterRequest) (*models.RegisterResponse, error)
 }
 
 type AuthService struct {

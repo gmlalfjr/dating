@@ -2,6 +2,10 @@ package app
 
 import "dating/controllers"
 
+var (
+	parentGroupAuth = "auth/"
+)
+
 type IRoutes interface {
 	registerRoutes()
 }
@@ -17,4 +21,13 @@ func initRoutes(controller *controllers.Controller) *Routes {
 
 }
 func (r *Routes) registerRoutes() {
+	r.authRouter()
+
+}
+
+func (r *Routes) authRouter() {
+	authRoute := router.Group(parentGroupAuth)
+	{
+		authRoute.POST("register", r.controller.AuthController.Register)
+	}
 }

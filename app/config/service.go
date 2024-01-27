@@ -10,7 +10,7 @@ type Services struct {
 
 func InitServices(repository Repository) *Services {
 	authService := &auth.AuthService{
-		AuthRepository: repository,
+		AuthRepository: repository.AuthRepo,
 	}
 
 	return &Services{

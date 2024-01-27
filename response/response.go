@@ -1,6 +1,7 @@
 package response
 
 import (
+	"dating/constants"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -10,7 +11,7 @@ type IResponse interface {
 }
 
 type Response struct {
-	Status     int         `json:"status"`
+	StatusCode int         `json:"status_code"`
 	Message    string      `json:"message"`
 	Data       interface{} `json:"data,omitempty"`
 	TotalPages int         `json:"total_page,omitempty"`
@@ -18,8 +19,8 @@ type Response struct {
 }
 
 func (res *Response) Success(c *gin.Context) {
-	if res.Status == 0 {
-		res.Status = http.StatusOK
+	if res.StatusCode == 0 {
+		res.StatusCode = http.StatusOK
 	}
 
 	res.Message = "OK"
@@ -27,8 +28,21 @@ func (res *Response) Success(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (res Response) Error(c *gin.Context, code int, message ...string) {
-	res.Status = code
-	res.Message = message[0]
-	c.JSON(code, res)
+func (res *Response) Error(c *gin.Context, err error) {
+	var resp = &Response{
+		StatusCode: http.StatusInternalServerError,
+		Message:    constants.InternalServerError,
+	}
+
+	if err != nil {
+		switch er := err.(type) {
+		case *Error:
+			resp = &Response{
+				StatusCode: er.statusCode,
+				Message:    er.message,
+			}
+		}
+	}
+	c.JSON(resp.StatusCode, resp)
+
 }

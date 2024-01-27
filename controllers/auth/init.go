@@ -2,9 +2,11 @@ package auth
 
 import (
 	"dating/service/auth"
+	"github.com/gin-gonic/gin"
 )
 
 type IAuthController interface {
+	Register(c *gin.Context)
 }
 
 type AuthController struct {
@@ -12,5 +14,7 @@ type AuthController struct {
 }
 
 func InitAuthController(auth auth.IAuthService) IAuthController {
-	return &AuthController{}
+	return &AuthController{
+		authService: auth,
+	}
 }

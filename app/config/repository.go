@@ -3,6 +3,7 @@ package config
 import (
 	"database/sql"
 	"dating/constants"
+	"dating/domains/entities"
 	"dating/repository/sql/auth"
 	"fmt"
 	"gorm.io/driver/postgres"
@@ -38,6 +39,10 @@ func initMySql() *gorm.DB {
 	if err != nil {
 		log.Println("status: ", err)
 		panic(err)
+	}
+
+	if constants.AutoMigrate == "true" {
+		dborm.AutoMigrate(&entities.User{})
 	}
 
 	return dborm

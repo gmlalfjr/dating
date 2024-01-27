@@ -8,4 +8,10 @@ type BaseRequest struct {
 	BodyData   interface{}       `mapper:"data"`
 	QueryParam map[string]string `mapper:"query_param"`
 	Param      uint              `mapper:"param"`
+	User       UserRequest       `mapper:"user"`
+}
+
+type UserRequest struct {
+	ID       int    `json:"id"`
+	Username string `json:"username"`
 }
