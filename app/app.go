@@ -56,4 +56,6 @@ func initEnv() {
 	constants.MySQLDBName = os.Getenv("DB_NAME")
 	constants.MySQLDBSchema = os.Getenv("DB_SCHEMA")
 	constants.AutoMigrate = os.Getenv("AUTOMIGRATE")
+	constants.JWTToken = os.Getenv("JWT_TOKEN")
+	constants.RefreshJWTToken = os.Getenv("REFRESH_JWT_TOKEN")
 }

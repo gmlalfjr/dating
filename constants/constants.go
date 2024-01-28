@@ -4,8 +4,6 @@ import "os"
 
 const (
 	InternalServerError = "Terjadi kesalahan pada server, silakan coba beberpa saat lagi"
-	BadRequest          = "Permintaan tidak sesuai"
-	NotFound            = "Data tidak ditemukan"
 )
 
 var (
